@@ -7,9 +7,9 @@ class Exercise(db.Model):
     __tablename__ = 'exercises'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    category = db.Column(db.String)
-    equipment_needed = db.Column(db.Boolean)
+    name = db.Column(db.String, nullable=False, unique=True)
+    category = db.Column(db.String, nullable=False)
+    equipment_needed = db.Column(db.Boolean, nullable=False)
 
     workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise')
     workouts = db.relationship('Workout', secondary='workout_exercises', back_populates='exercises')
