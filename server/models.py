@@ -14,6 +14,26 @@ class Exercise(db.Model):
     workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise')
     workouts = db.relationship('Workout', secondary='workout_exercises', back_populates='exercises')
 
+    @validates('name')
+    def validate_name(self, key, value):
+        if not value or value.strip() == '':
+            raise ValueError("Exercise name cannot be empty")
+        return value
+
+    @validates('category')
+    def validate_category(self, key, value):
+        allowed = ['weight training', 'cardio', 'yoga', 'spin', 'pilates', 'crossfit', 'other']
+        if value.lower() not in allowed:
+            raise ValueError(f"Category must be one of: {', '.join(allowed)}")
+        return value.lower()
+
+    @validates('equipment_needed')
+    def validate_equipment_needed(self, key, value):
+        if not isinstance(value, bool):
+            raise ValueError("equipment_needed must be a boolean")
+        return value
+
+
 
 class Workout(db.Model):
     __tablename__ = 'workouts'
@@ -32,8 +52,8 @@ class WorkoutExercise(db.Model):
     __tablename__ = 'workout_exercises'
 
     id = db.Column(db.Integer, primary_key=True)
-    workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'))
-    exercise_id = db.Column(db.Integer, db.ForeignKey('exercises.id'))
+    workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'), nullable=False)
+    exercise_id = db.Column(db.Integer, db.ForeignKey('exercises.id'), nullable=False)
     reps = db.Column(db.Integer)
     sets = db.Column(db.Integer)
     duration_seconds = db.Column(db.Integer)
