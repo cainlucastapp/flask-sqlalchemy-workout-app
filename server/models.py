@@ -46,6 +46,19 @@ class Workout(db.Model):
     workout_exercises = db.relationship('WorkoutExercise', back_populates='workout')
     exercises = db.relationship('Exercise', secondary='workout_exercises', back_populates='workouts')
 
+    @validates('duration_minutes')
+    def validate_duration(self, key, value):
+        if value <= 0:
+            raise ValueError("Duration must be greater than 0")
+        return value
+
+    @validates('date')
+    def validate_date(self, key, value):
+        if not value:
+            raise ValueError("Date cannot be empty")
+        return value
+    
+
 
 # Join table for workouts and exercises
 class WorkoutExercise(db.Model):
