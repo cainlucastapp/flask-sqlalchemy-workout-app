@@ -73,3 +73,15 @@ class WorkoutExercise(db.Model):
 
     workout = db.relationship('Workout', back_populates='workout_exercises')
     exercise = db.relationship('Exercise', back_populates='workout_exercises')
+
+    @validates('sets', 'reps')
+    def validate_sets_reps(self, key, value):
+        if value is not None and value <= 0:
+            raise ValueError(f"{key} must be greater than 0")
+        return value
+
+    @validates('duration_seconds')
+    def validate_duration_seconds(self, key, value):
+        if value is not None and value <= 0:
+            raise ValueError("duration_seconds must be greater than 0")
+        return value
