@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
+from marshmallow import Schema, fields
 db = SQLAlchemy()
 
 
@@ -85,3 +86,27 @@ class WorkoutExercise(db.Model):
         if value is not None and value <= 0:
             raise ValueError("duration_seconds must be greater than 0")
         return value
+    
+    
+# Marshmallow Schemas
+class WorkoutExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    workout_id = fields.Int()
+    exercise_id = fields.Int()
+    reps = fields.Int()
+    sets = fields.Int()
+    duration_seconds = fields.Int()
+
+class ExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    category = fields.Str()
+    equipment_needed = fields.Bool()
+
+class WorkoutSchema(Schema):
+    id = fields.Int(dump_only=True)
+    date = fields.Date()
+    duration_minutes = fields.Int()
+    notes = fields.Str()
+    exercises = fields.List(fields.Nested(ExerciseSchema), dump_only=True)
+    workout_exercises = fields.List(fields.Nested(WorkoutExerciseSchema), dump_only=True)
