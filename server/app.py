@@ -54,19 +54,38 @@ def delete_workout(id):
 
 @app.route('/exercises', methods=['GET'])
 def get_exercises():
-    return make_response(jsonify({'message': 'list all exercises'}), 200)
+    exercises = Exercise.query.all()
+    schema = ExerciseSchema(many=True)
+    return make_response(jsonify(schema.dump(exercises)), 200)
 
 @app.route('/exercises/<int:id>', methods=['GET'])
 def get_exercise(id):
-    return make_response(jsonify({'message': f'get exercise {id}'}), 200)
+    exercise = Exercise.query.get(id)
+    if not exercise:
+        return make_response(jsonify({'error': 'Exercise not found'}), 404)
+    schema = ExerciseSchema()
+    return make_response(jsonify(schema.dump(exercise)), 200)
 
 @app.route('/exercises', methods=['POST'])
 def create_exercise():
-    return make_response(jsonify({'message': 'create exercise'}), 201)
+    data = request.get_json()
+    schema = ExerciseSchema()
+    errors = schema.validate(data)
+    if errors:
+        return make_response(jsonify(errors), 400)
+    exercise = Exercise(**data)
+    db.session.add(exercise)
+    db.session.commit()
+    return make_response(jsonify(schema.dump(exercise)), 201)
 
 @app.route('/exercises/<int:id>', methods=['DELETE'])
 def delete_exercise(id):
-    return make_response(jsonify({'message': f'delete exercise {id}'}), 200)
+    exercise = Exercise.query.get(id)
+    if not exercise:
+        return make_response(jsonify({'error': 'Exercise not found'}), 404)
+    db.session.delete(exercise)
+    db.session.commit()
+    return make_response(jsonify({'message': f'Exercise {id} deleted successfully'}), 200)
 
 
 # WorkoutExercise Routes

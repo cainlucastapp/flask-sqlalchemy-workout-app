@@ -14,7 +14,7 @@ class Exercise(db.Model):
     category = db.Column(db.String, nullable=False)
     equipment_needed = db.Column(db.Boolean, nullable=False)
 
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', overlaps="workouts")
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', overlaps="workouts", cascade="all, delete-orphan")
     workouts = db.relationship('Workout', secondary='workout_exercises', back_populates='exercises', overlaps="workout_exercises")
 
     @validates('name')
