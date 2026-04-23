@@ -1,6 +1,7 @@
 from wsgiref import validate
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import validates
 from marshmallow import Schema, fields, validate
 db = SQLAlchemy()
 
@@ -45,7 +46,7 @@ class Workout(db.Model):
     duration_minutes = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text)
 
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', overlaps="exercises")
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', overlaps="exercises", cascade="all, delete-orphan")
     exercises = db.relationship('Exercise', secondary='workout_exercises', back_populates='workouts', overlaps="workout_exercises")
 
     @validates('duration_minutes')
