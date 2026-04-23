@@ -92,7 +92,29 @@ def delete_exercise(id):
 
 @app.route('/workouts/<int:workout_id>/exercises/<int:exercise_id>/workout_exercises', methods=['POST'])
 def create_workout_exercise(workout_id, exercise_id):
-    return make_response(jsonify({'message': f'add exercise {exercise_id} to workout {workout_id}'}), 201)
+    workout = Workout.query.get(workout_id)
+    if not workout:
+        return make_response(jsonify({'error': 'Workout not found'}), 404)
+    
+    exercise = Exercise.query.get(exercise_id)
+    if not exercise:
+        return make_response(jsonify({'error': 'Exercise not found'}), 404)
+    
+    data = request.get_json()
+    schema = WorkoutExerciseSchema()
+    errors = schema.validate(data)
+    if errors:
+        return make_response(jsonify(errors), 400)
+    
+    workout_exercise = WorkoutExercise(
+        workout_id=workout_id,
+        exercise_id=exercise_id,
+        **data
+    )
+    db.session.add(workout_exercise)
+    db.session.commit()
+    return make_response(jsonify(schema.dump(workout_exercise)), 201)
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
