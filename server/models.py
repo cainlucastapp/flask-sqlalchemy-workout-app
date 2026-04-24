@@ -15,20 +15,20 @@ class Exercise(db.Model):
     workouts = db.relationship('Workout', secondary='workout_exercises', back_populates='exercises', overlaps="workout_exercises")
 
     @validates('name')
-    def validate_name(self, key, value):
+    def validate_name(self, _key, value):
         if not value or value.strip() == '':
             raise ValueError("Exercise name cannot be empty")
         return value
 
     @validates('category')
-    def validate_category(self, key, value):
+    def validate_category(self, _key, value):
         allowed = ['weight training', 'cardio', 'yoga', 'spin', 'pilates', 'crossfit', 'other']
         if value.lower() not in allowed:
             raise ValueError(f"Category must be one of: {', '.join(allowed)}")
         return value.lower()
 
     @validates('equipment_needed')
-    def validate_equipment_needed(self, key, value):
+    def validate_equipment_needed(self, _key, value):
         if not isinstance(value, bool):
             raise ValueError("equipment_needed must be a boolean")
         return value
@@ -47,13 +47,13 @@ class Workout(db.Model):
     exercises = db.relationship('Exercise', secondary='workout_exercises', back_populates='workouts', overlaps="workout_exercises")
 
     @validates('duration_minutes')
-    def validate_duration(self, key, value):
+    def validate_duration(self, _key, value):
         if value <= 0:
             raise ValueError("Duration must be greater than 0")
         return value
 
     @validates('date')
-    def validate_date(self, key, value):
+    def validate_date(self, _key, value):
         if not value:
             raise ValueError("Date cannot be empty")
         return value
@@ -81,7 +81,7 @@ class WorkoutExercise(db.Model):
         return value
 
     @validates('duration_seconds')
-    def validate_duration_seconds(self, key, value):
+    def validate_duration_seconds(self, _key, value):
         if value is not None and value <= 0:
             raise ValueError("duration_seconds must be greater than 0")
         return value
