@@ -11,7 +11,7 @@ class Exercise(db.Model):
     category = db.Column(db.String, nullable=False)
     equipment_needed = db.Column(db.Boolean, nullable=False)
 
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', overlaps="workouts", cascade="all, delete-orphan")
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', overlaps="workouts", cascade="all, delete-orphan", passive_deletes=True)
     workouts = db.relationship('Workout', secondary='workout_exercises', back_populates='exercises', overlaps="workout_exercises")
 
     @validates('name')
@@ -43,7 +43,7 @@ class Workout(db.Model):
     duration_minutes = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text)
 
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', overlaps="exercises", cascade="all, delete-orphan")
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', overlaps="exercises", cascade="all, delete-orphan", passive_deletes=True)
     exercises = db.relationship('Exercise', secondary='workout_exercises', back_populates='workouts', overlaps="workout_exercises")
 
     @validates('duration_minutes')
