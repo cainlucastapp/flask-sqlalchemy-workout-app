@@ -31,7 +31,7 @@ def get_workout(id):
 
 @app.route('/workouts', methods=['POST'])
 def create_workout():
-    data = request.get_json()
+    data = request.get_json(force=True, silent=True)
     if not data:
         return make_response(jsonify({'error': 'No data provided'}), 400)
     schema = WorkoutSchema()
@@ -39,7 +39,8 @@ def create_workout():
     if errors:
         return make_response(jsonify(errors), 400)
     try:
-        workout = Workout(**data)
+        loaded_data = schema.load(data)
+        workout = Workout(**loaded_data)
         db.session.add(workout)
         db.session.commit()
         return make_response(jsonify(schema.dump(workout)), 201)
@@ -79,7 +80,7 @@ def get_exercise(id):
 
 @app.route('/exercises', methods=['POST'])
 def create_exercise():
-    data = request.get_json()
+    data = request.get_json(force=True, silent=True)
     if not data:
         return make_response(jsonify({'error': 'No data provided'}), 400)
     schema = ExerciseSchema()
@@ -87,7 +88,8 @@ def create_exercise():
     if errors:
         return make_response(jsonify(errors), 400)
     try:
-        exercise = Exercise(**data)
+        loaded_data = schema.load(data)
+        exercise = Exercise(**loaded_data)
         db.session.add(exercise)
         db.session.commit()
         return make_response(jsonify(schema.dump(exercise)), 201)
@@ -121,7 +123,7 @@ def create_workout_exercise(workout_id, exercise_id):
     if not exercise:
         return make_response(jsonify({'error': 'Exercise not found'}), 404)
 
-    data = request.get_json()
+    data = request.get_json(force=True, silent=True)
     if not data:
         return make_response(jsonify({'error': 'No data provided'}), 400)
     schema = WorkoutExerciseSchema()
@@ -129,10 +131,11 @@ def create_workout_exercise(workout_id, exercise_id):
     if errors:
         return make_response(jsonify(errors), 400)
     try:
+        loaded_data = schema.load(data)
         workout_exercise = WorkoutExercise(
             workout_id=workout_id,
             exercise_id=exercise_id,
-            **data
+            **loaded_data
         )
         db.session.add(workout_exercise)
         db.session.commit()
